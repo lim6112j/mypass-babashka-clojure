@@ -1,2 +1,4 @@
 {:paths ["src"]
- :deps {org.clojure/tools.cli {:mvn/version "1.0.214"}}}
+ :deps {org.clojure/tools.cli {:mvn/version "1.0.214"}}
+ :tasks {clean (shell "rm -rf target")}
+ }

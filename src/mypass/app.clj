@@ -1,6 +1,7 @@
-(ns mypass.app 
+(ns mypass.app
   (:require [clojure.tools.cli :refer [parse-opts]])
   (:gen-class))
+
 (def cli-options
   ;; An option with a required argument
   [["-p" "--port PORT" "Port number"
@@ -14,7 +15,8 @@
     :update-fn inc] ; Prior to 0.4.1, you would have to use:
                    ;; :assoc-fn (fn [m k _] (update-in m [k] inc))
    ;; A boolean option defaulting to nil
-   ["-h" "--help"]])
+   ["-h" "--help"]
+   ])
 
 (defn -main [& args]
-  (parse-opts args cli-options))
+  (println(parse-opts args cli-options)))
