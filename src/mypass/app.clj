@@ -3,7 +3,8 @@
             [mypass.db :as db]
             [table.core :as t]
             [mypass.password :refer [generate-password]]
-            [mypass.stash :as stash])
+            [mypass.stash :as stash]
+            [mypass.clipboard :refer [copy]])
   (:gen-class))
 ;;https://github.com/cldwalker/table
 
@@ -16,21 +17,27 @@
    ["-g" "--generate" "Generate new password"]
    [nil "--list"]])
 (defn password-input []
-  (println "master password")
+  (println "master password(default : \"password\")")
   (String. (.readPassword (System/console))))
 (defn -main [& args]
   (let [parsed-options (parse-opts args cli-options)
         url (first (:arguments parsed-options))
         username (second (:arguments parsed-options))
         options (:options parsed-options)]
-    (println parsed-options)
     (cond
       (:generate options) (do
                             (stash/stash-init (password-input))
                             (let [password (generate-password (:length options))]
                               (db/insert-password url username)
                               (stash/add-password url username password)
-                              (println "password added :" password)))
+                              (println "password added :" password)
+                              (copy password)))
+      (and url username) (do
+                          (stash/stash-init (password-input))
+                          (let [password (stash/find-password url username)]
+                            (println "password :" password)
+                            (copy password)
+                            (println "password copied to clipboard")))
       (:list options) (t/table (db/list-passwords))
       :else (println "default"))))
 (comment

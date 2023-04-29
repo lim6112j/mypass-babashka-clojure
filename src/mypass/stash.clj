@@ -20,8 +20,12 @@
   If a parent-node-id is provided, only nodes with that parent-id are returned."
   ([] (stash-nodes 0))
   ([parent-id] (stash/nodes parent-id)))
-
+(defn find-password [url username]
+  (let [nodes (stash-nodes 0)
+        node (first (filter #(= (str url username) (:key %)) nodes))]
+    (:value node)))
 (comment
   (stash-nodes)
+  (find-password "facebook.com" "test12@test.com")
   (add-password "facebook.com" "test" "secret")
   (stash-init "password"))
