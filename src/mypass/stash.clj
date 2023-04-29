@@ -28,4 +28,4 @@
   (stash-nodes)
   (find-password "facebook.com" "test12@test.com")
   (add-password "facebook.com" "test" "secret")
-  (stash-init "password"))
+  (stash-init "Pjonvd#pR6"))
