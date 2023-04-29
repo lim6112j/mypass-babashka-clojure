@@ -1,8 +1,8 @@
 (ns mypass.stash
-  (:require [babashka.pod :as pods]))
+  (:require [babashka.pods :as pods]))
 
 (def ^{:doc "path to stash file"} stash-file-path "mypass.stash")
-(pods/load-pod 'rorokimdim/stash "0.2.0")
+(pods/load-pod 'rorokimdim/stash "0.3.2")
 (require '[pod.rorokimdim.stash :as stash])
 (defn stash-init
   "Initializes stash.
@@ -13,12 +13,15 @@
                "create-stash-if-missing" true}))
 
 (defn stash-add "Adds a new node under a parent" [parent-id k v] (stash/add parent-id k v))
-(defn add-password [url username password] (stash-add 0 (str url username) password))
+(defn add-password [url username password]
+  (stash-add 0 (str url username) password))
 (defn stash-nodes
   "Gets all nodes stored in stash
   If a parent-node-id is provided, only nodes with that parent-id are returned."
   ([] (stash-nodes 0))
   ([parent-id] (stash/nodes parent-id)))
 
-(comment (stash-add "facebook.com" "test" "secret")
-         (stash-init "password"))
+(comment
+  (stash-nodes)
+  (add-password "facebook.com" "test" "secret")
+  (stash-init "password"))

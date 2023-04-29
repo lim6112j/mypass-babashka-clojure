@@ -1,8 +1,9 @@
 (ns mypass.app
   (:require [clojure.tools.cli :refer [parse-opts]]
-            [mypass.db :refer [list-passwords]]
+            [mypass.db :as db]
             [table.core :as t]
-            [mypass.password :refer [generate-password]])
+            [mypass.password :refer [generate-password]]
+            [mypass.stash :as stash])
   (:gen-class))
 ;;https://github.com/cldwalker/table
 
@@ -14,6 +15,9 @@
     :validate [#(< 0 % 0x10000) "Must be a number between 0 and 65536"]]
    ["-g" "--generate" "Generate new password"]
    [nil "--list"]])
+(defn password-input []
+  (println "master password")
+  (String. (.readPassword (System/console))))
 (defn -main [& args]
   (let [parsed-options (parse-opts args cli-options)
         url (first (:arguments parsed-options))
@@ -21,11 +25,16 @@
         options (:options parsed-options)]
     (println parsed-options)
     (cond
-      (:generate options) (let [password (generate-password (:length options))] (println password))
-      (:list options) (t/table (list-passwords))
+      (:generate options) (do
+                            (stash/stash-init (password-input))
+                            (let [password (generate-password (:length options))]
+                              (db/insert-password url username)
+                              (stash/add-password url username password)
+                              (println "password added :" password)))
+      (:list options) (t/table (db/list-passwords))
       :else (println "default"))))
 (comment
   (-main)
-  (t/table (list-passwords)))
+  (t/table (db/list-passwords)))
 (comment
   (generate-password 10))
